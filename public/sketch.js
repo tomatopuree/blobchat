@@ -144,6 +144,12 @@ function draw() {
   // text(blob.pos.x + " : " + blob.pos.y, Math.ceil(resolutionW*(18/20)), Math.ceil(resolutionH*(18/20)));
   text(blob.pos.x + " : " + blob.pos.y, ~~(resolutionW*(18/20)), ~~(resolutionH*(19/20)));
 
+  fill('red');
+  textAlign(CENTER);
+  textSize(10);
+  // text(blob.pos.x + " : " + blob.pos.y, Math.ceil(resolutionW*(18/20)), Math.ceil(resolutionH*(18/20)));
+  text("Number of currently online: " + Object.keys(blobsdict).length, ~~(resolutionW*(18/20)), ~~(resolutionH*(18.5/20)));
+
 
   translate(width / 2, height / 2);
   var newzoom = 64 / blob.r;
