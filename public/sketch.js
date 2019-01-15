@@ -116,23 +116,23 @@ function draw() {
 
 
     fill(0, 0, 0, 255);
-    // disappearing chat
-    for (var j = 10; j > 0; j--) {
-      if (chatslist[i][1]+3000+(100*j) < time) {
-        fill(0, 0, 0, Math.round((j/10)*255));
-      }
-    }
+    // // disappearing chat
+    // for (var j = 10; j > 0; j--) {
+    //   if (chatslist[i][1]+3000+(100*j) < time) {
+    //     fill(0, 0, 0, Math.round((j/10)*255));
+    //   }
+    // }
     var username = chatslist[i][2];
     text(username + ": ", ~~(resolutionW*(0.6/20)), ~~((resolutionH*(16/20))+i*30));
     
 
     fill(255, 255, 255, 255);;
     // disappearing chat
-    for (var j = 10; j > 0; j--) {
-      if (chatslist[i][1]+3000+(100*j) == time) {
-        fill(255, 255, 255, Math.round((j/10)*255));
-      }
-    }
+    // for (var j = 10; j > 0; j--) {
+    //   if (chatslist[i][1]+3000+(100*j) == time) {
+    //     fill(255, 255, 255, Math.round((j/10)*255));
+    //   }
+    // }
     var userschat = chatslist[i][0];
     text(userschat, ~~(resolutionW*(0.6/20)) + textWidth(username)+8, ~~((resolutionH*(16/20))+i*30));
     }
