@@ -4,12 +4,25 @@
   "description": "blobchat",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
   },
   "author": "tomatopuree",
   "license": "MIT",
   "dependencies": {
     "express": "^4.13.4",
     "socket.io": "^1.4.5"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tomatopuree/blobchat.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tomatopuree/blobchat/issues"
+  },
+  "homepage": "https://github.com/tomatopuree/blobchat#readme",
+  "engines": {
+    "node": "8.10.0"
   }
 }
