@@ -1,5 +1,3 @@
-
-
 function Blob(name, id, x, y, r) {
   this.lastchat = "";
   this.lastchattime;
@@ -9,17 +7,16 @@ function Blob(name, id, x, y, r) {
   this.r = r;
   this.vel = createVector(0, 0);
 
-
-  this.update = function() {
-    var newvel = createVector(mouseX - width / 2, mouseY - height / 2);
+  /// update position and smooth velocity
+  this.updatepos = function() {
+    var newvel = createVector(mouseX - width / 2, mouseY - height / 2).div(50);
     // this is the speed limit
-    newvel.div(50);
-    //newvel.setMag(3);
     newvel.limit(1);
     this.vel.lerp(newvel, 0.2);
     this.pos.add(this.vel);
   }
 
+  // here for salvaging
   this.eats = function(other) {
     var d = p5.Vector.dist(this.pos, other.pos);
     if (d < this.r + other.r) {
@@ -32,11 +29,13 @@ function Blob(name, id, x, y, r) {
     }
   }
 
+  /// constrain 2nd, 3rd argument is the constraint of variable
   this.constrain = function() {
     blob.pos.x = constrain(blob.pos.x, -width / 4, width / 4);
     blob.pos.y = constrain(blob.pos.y, -height / 4, height / 4);
   }
 
+  /// draw it!
   this.show = function() {
     fill(255);
     ellipse(this.pos.x, this.pos.y, this.r * 2, this.r * 2);

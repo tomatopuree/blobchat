@@ -1,9 +1,21 @@
+function Server(blobsdict, chatslist, serverpermanents) {
+  this.blobsdict = blobsdict;
+  this.chatslist = chatslist;
+  this.serverpermanents = serverpermanents;
+}
+
+currentserver = new Server(blobsdict = {}, chatslist = [], serverpermanents = []);
+
+// use above
+
+
 
 var socket;
 
 var blob;
 var blobsdict = {};
 var chatslist = [];
+var serverpermanents = [];
 
 var zoom = 1;
 var input, button, greeting;
@@ -15,7 +27,8 @@ function setup() {
   
   createCanvas(resolutionW, resolutionH);
   
-  socket = io.connect('https://damp-citadel-76206.herokuapp.com/');
+  // socket = io.connect('https://damp-citadel-76206.herokuapp.com/');
+  socket = io.connect('http://localhost:3000');
 
   // CHAT INPUT
   input = createInput();
@@ -25,7 +38,6 @@ function setup() {
   button.position(input.x + input.width, (resolutionH*(19.1/20)));
   button.mousePressed(chatin);
 
-
   // NAME INPUT
   input2 = createInput();
   input2.position((resolutionW*(0.7/20)), (resolutionH*(0.7/20)));
@@ -34,11 +46,11 @@ function setup() {
   button2.position(input2.x + input.width, (resolutionH*(0.7/20)));
   button2.mousePressed(namein);
 
-
   textAlign(CENTER);
   textSize(50);
 
-  blob = new Blob(socket.id, socket.id, random(width), random(height), random(8, 24));
+  // MAKE BLOB
+  blob = new Blob(socket.id, socket.id, 0, 0, random(18,24));
   var data = {
     x: blob.pos.x,
     y: blob.pos.y,
@@ -49,90 +61,35 @@ function setup() {
 
   socket.on('heartbeat',
     function(data) {
-      chatslist = data[1];
-      blobsdict = data[0];
+      console.log(data);
+      chatslist = data.chatslist;
+      blobsdict = data.blobsdict;
+      serverpermanents = data.serverpermanents;
     }
   );
 }
 
 
-function keyPressed() {
-  if (keyCode == ENTER) {
-    chatin();
-  }
-}
-
-function namein() {
-  // IF BUTTON SHOULD DISAPPEAR
-
-  var name = input2.value();
-
-  var data = {
-    id: blob.id,
-    name: name
-  }
-
-  socket.emit('name', data);
-  button2.hide();
-  input2.hide();
-
-  button3 = createButton('Rename Character');
-  button3.position((resolutionW*(0.7/20)), (resolutionH*(0.7/20)));
-  button3.mousePressed(rename);
-}
-
-function rename() {
-  button3.hide();
-  button2.show();
-  input2.show();
-}
-
-function chatin() {
-  var chat = input.value();
-
-  var time = +new Date;
-  var data = {
-    name: blobsdict[socket.id].name,
-    chat: chat,
-    time: time
-  }
-  
-  socket.emit('chat', data);
-
-  input.value('');
-}
-
 
 function draw() {
   background(200);
-  // if you want stream of positions on the console
-  // console.log(blob.pos.x, blob.pos.y); 
 
-  // CHAT WINDOW
+
+
+
+  // DRAW CHAT WINDOW
   for (var i = 0; i < chatslist.length; i++) {
     textAlign(LEFT);
     textSize(18);
     var time = +new Date;
 
-
     fill(0, 0, 0, 255);
-    // // disappearing chat
-    // for (var j = 10; j > 0; j--) {
-    //   if (chatslist[i][1]+3000+(100*j) < time) {
-    //     fill(0, 0, 0, Math.round((j/10)*255));
-    //   }
-    // }
+
     var username = chatslist[i][2];
     text(username + ": ", ~~(resolutionW*(0.6/20)), ~~((resolutionH*(16/20))+i*30));
     
-
     fill(255, 255, 255, 255);;
-    // disappearing chat
-    // for (var j = 10; j > 0; j--) {
-    //   if (chatslist[i][1]+3000+(100*j) == time) {
-    //     fill(255, 255, 255, Math.round((j/10)*255));
-    //   }
-    // }
+
     var userschat = chatslist[i][0];
     text(userschat, ~~(resolutionW*(0.6/20)) + textWidth(username)+8, ~~((resolutionH*(16/20))+i*30));
     }
@@ -141,16 +98,16 @@ function draw() {
   fill('red');
   textAlign(CENTER);
   textSize(10);
-  // text(blob.pos.x + " : " + blob.pos.y, Math.ceil(resolutionW*(18/20)), Math.ceil(resolutionH*(18/20)));
   text(blob.pos.x + " : " + blob.pos.y, ~~(resolutionW*(18/20)), ~~(resolutionH*(19/20)));
 
-  fill('red');
   textAlign(CENTER);
   textSize(10);
-  // text(blob.pos.x + " : " + blob.pos.y, Math.ceil(resolutionW*(18/20)), Math.ceil(resolutionH*(18/20)));
   text("Number of currently online: " + Object.keys(blobsdict).length, ~~(resolutionW*(18/20)), ~~(resolutionH*(18.5/20)));
 
 
+  // Anything before this chunk of code will be anchored to "camera"
+  // Anything after this chunk of code will not be anchored to "camera"
+  // "camera" follows blob, scale w/ size
   translate(width / 2, height / 2);
   var newzoom = 64 / blob.r;
   zoom = lerp(zoom, newzoom, 0.1);
@@ -158,9 +115,7 @@ function draw() {
   translate(-blob.pos.x, -blob.pos.y);
 
 
-  textSize(50);
-  text(blob.pos.x + " : " + blob.pos.y, 1390, 850);
-
+  // Draw names and chats
   for (var keyy in blobsdict) {
     var id = socket.id;
 
@@ -174,15 +129,27 @@ function draw() {
     fill(0);
     text(blobsdict[keyy].name, blobsdict[keyy].x, blobsdict[keyy].y - (blobsdict[keyy].r+2));
 
-    // blobs[i].show();
-    // if (blob.eats(blobs[i])) {
-    //   blobs.splice(i, 1);
-    // }
   }
+
+
+
+
+  //  create world using server permanents
+  // for (var k = 0; k < serverpermanents.length; k++) {
+
+  //   // portal & portaltext
+  //   fill(255);
+  //   ellipse(serverpermanents[k].pos.x, serverpermanents[k].pos.y, serverpermanents[k].r, serverpermanents[k].r);
+  //   fill('blue');
+  //   textAlign(CENTER);
+  //   textSize(6);
+  //   text(serverpermanents[k].name, serverpermanents[k].pos.x-1, -5);
+  // }
+
 
   blob.show();
   if (mouseIsPressed) {
-    blob.update();
+    blob.updatepos();
   }
   blob.constrain();
 
@@ -194,4 +161,69 @@ function draw() {
   socket.emit('update', data);
 
 
+
+  
+
+
+}
+
+
+
+
+
+
+
+//////////// BUTTONS AND KEY PRESSES
+
+/// Handles all key presses
+function keyPressed() {
+  if (keyCode == ENTER) {
+    chatin();
+  }
+  if (keyCode == UP_ARROW) {
+    console.log("uparrow");
+    var data = {message: "toGame"};
+    socket.emit('serverchange', data);
+  }
+}
+
+///  name input, sends name to server
+function namein() {
+  var name = input2.value();
+
+  var data = {
+    id: blob.id,
+    name: name
+  };
+
+  socket.emit('name', data);
+  button2.hide();
+  input2.hide();
+
+  button3 = createButton('Rename Character');
+  button3.position((resolutionW*(0.7/20)), (resolutionH*(0.7/20)));
+  button3.mousePressed(rename);
+}
+
+/// helper
+function rename() {
+  button3.hide();
+  button2.show();
+  input2.show();
+}
+
+/// chat input, sends chat to server
+function chatin() {
+  var chat = input.value();
+
+  var time = +new Date;
+  var data = {
+    name: blobsdict[socket.id].name,
+    chat: chat,
+    time: time
+  };
+  
+  socket.emit('chat', data);
+
+  input.value('');
 }
