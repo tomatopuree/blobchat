@@ -208,26 +208,26 @@ io.sockets.on('connection',
 
 
 
-		socket.on('serverchange', function(data) {
-			// console.log("Len of dict is " + Object.keys(blobsdict).length);
+		// socket.on('serverchange', function(data) {
+		// 	// console.log("Len of dict is " + Object.keys(blobsdict).length);
 
-			// make game server if there isnt one
+		// 	// make game server if there isnt one
 
 
 		 		
-		 	// this user is in game server now
-		 	// console.log(Object.keys(serversdict));
+		//  	// this user is in game server now
+		//  	// console.log(Object.keys(serversdict));
 
 
 
 
-			// console.log("Client " + serversdict[usertoservermap[socket.id]].blobsdict[socket.id].name + " changed server to " + usertoservermap[socket.id]);
+		// 	// console.log("Client " + serversdict[usertoservermap[socket.id]].blobsdict[socket.id].name + " changed server to " + usertoservermap[socket.id]);
 
 
 
 
 
-		});
+		// });
   }
 );
 
