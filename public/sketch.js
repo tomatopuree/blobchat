@@ -6,10 +6,6 @@ function Server(blobsdict, chatslist, serverpermanents) {
 
 currentserver = new Server(blobsdict = {}, chatslist = [], serverpermanents = []);
 
-// use above
-
-
-
 var socket;
 
 var blob;
@@ -73,9 +69,6 @@ function setup() {
 function draw() {
   background(200);
 
-
-
-
   // DRAW CHAT WINDOW
   for (var i = 0; i < chatslist.length; i++) {
     textAlign(LEFT);
@@ -130,9 +123,6 @@ function draw() {
 
   }
 
-
-
-
   //  create world using server permanents
   // for (var k = 0; k < serverpermanents.length; k++) {
 
@@ -144,7 +134,6 @@ function draw() {
   //   textSize(6);
   //   text(serverpermanents[k].name, serverpermanents[k].pos.x-1, -5);
   // }
-
 
   blob.show();
   if (mouseIsPressed) {
@@ -159,15 +148,7 @@ function draw() {
   };
   socket.emit('update', data);
 
-
-
-  
-
-
 }
-
-
-
 
 
 
@@ -188,7 +169,6 @@ function keyPressed() {
     socket.emit('serverchange', data);
   }
 }
-
 
 ///  name input, sends name to server
 function namein() {
