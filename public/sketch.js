@@ -61,7 +61,6 @@ function setup() {
 
   socket.on('heartbeat',
     function(data) {
-      console.log(data);
       chatslist = data.chatslist;
       blobsdict = data.blobsdict;
       serverpermanents = data.serverpermanents;
@@ -181,11 +180,15 @@ function keyPressed() {
     chatin();
   }
   if (keyCode == UP_ARROW) {
-    console.log("uparrow");
-    var data = {message: "toGame"};
+    var data = {message: "game"};
+    socket.emit('serverchange', data);
+  }
+  if (keyCode == DOWN_ARROW) {
+    var data = {message: "lobby"};
     socket.emit('serverchange', data);
   }
 }
+
 
 ///  name input, sends name to server
 function namein() {
