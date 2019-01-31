@@ -212,42 +212,6 @@ io.sockets.on('connection',
 			// console.log("Len of dict is " + Object.keys(blobsdict).length);
 
 			// make game server if there isnt one
-			if (data.message == "game" && !('game' in serversdict)){
-
-				var chatslist = [];
-				var blobsdict = {};
-				// game server world permanents
-				portal3 = new Blob("Portal back to Lobby", "portal3", 0, 40, 5);
-				serverpermanents.push(portal1);
-				var serverpermanents = [];
-				
-				// put new server in serversdict
-				gameserver = new Server(blobsdict, chatslist, serverpermanents);
-				serversdict['game'] = gameserver;
-			}
-
-
-
-			// ROOM
-			if (data.message == "game") {
-				socket.leave('lobby');
-				socket.join('game');	
-				usertoservermap[socket.id] = 'game';
-				// put blob in new server
-				serversdict[usertoservermap[socket.id]].blobsdict[socket.id] = serversdict['lobby'].blobsdict[socket.id];
-				// take blob off old server
-				delete serversdict['lobby'].blobsdict[socket.id];
-			}
-
-			if (data.message == "lobby") {
-				socket.leave('game');
-				socket.join('lobby');	
-				usertoservermap[socket.id] = 'lobby';
-				// put blob in new server
-				serversdict[usertoservermap[socket.id]].blobsdict[socket.id] = serversdict['game'].blobsdict[socket.id];
-				// take blob off old server
-				delete serversdict['game'].blobsdict[socket.id];
-			}
 
 
 		 		
@@ -257,7 +221,7 @@ io.sockets.on('connection',
 
 
 
-			console.log("Client " + serversdict[usertoservermap[socket.id]].blobsdict[socket.id].name + " changed server to " + usertoservermap[socket.id]);
+			// console.log("Client " + serversdict[usertoservermap[socket.id]].blobsdict[socket.id].name + " changed server to " + usertoservermap[socket.id]);
 
 
 

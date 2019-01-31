@@ -166,14 +166,6 @@ function keyPressed() {
   if (keyCode == ENTER) {
     chatin();
   }
-  if (keyCode == UP_ARROW) {
-    var data = {message: "game"};
-    socket.emit('serverchange', data);
-  }
-  if (keyCode == DOWN_ARROW) {
-    var data = {message: "lobby"};
-    socket.emit('serverchange', data);
-  }
 }
 
 ///  name input, sends name to server
