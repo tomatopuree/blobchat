@@ -12,6 +12,7 @@ currentserver = new Server(blobsdict = {}, chatslist = [], serverpermanents = []
 var socket;
 
 var blob;
+var currentservername;
 var blobsdict = {};
 var chatslist = [];
 var serverpermanents = [];
@@ -60,9 +61,10 @@ function setup() {
 
   socket.on('heartbeat',
     function(data) {
-      chatslist = data.chatslist;
-      blobsdict = data.blobsdict;
-      serverpermanents = data.serverpermanents;
+      chatslist = data[0].chatslist;
+      blobsdict = data[0].blobsdict;
+      serverpermanents = data[0].serverpermanents;
+      currentservername = data[1];
     }
   );
 }
@@ -97,7 +99,10 @@ function draw() {
 
   textAlign(CENTER);
   textSize(10);
-  text("Number of currently online: " + Object.keys(blobsdict).length, ~~(resolutionW*(18/20)), ~~(resolutionH*(18.5/20)));
+  text("People in room: " + Object.keys(blobsdict).length, ~~(resolutionW*(18/20)), ~~(resolutionH*(18.5/20)));
+
+  console.log(socket.rooms);
+  text("In room " + currentservername, ~~(resolutionW*(18/20)), ~~(resolutionH*(18/20)));
 
 
   // Anything before this chunk of code will be anchored to "camera"

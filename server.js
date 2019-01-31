@@ -39,8 +39,6 @@ function Server(blobsdict, chatslist, serverpermanents) {
 var serversdict = {};
 var usertoservermap = {};
 
-var servers = ['lobby', 'game', 'roomtwo'];
-
 
 /// Register a callback function upon each individual connection
 io.sockets.on('connection',
@@ -76,7 +74,7 @@ io.sockets.on('connection',
 			// io.sockets.emit('heartbeat', serversdict[usertoservermap[socket.id]]);
 			// ROOM
 			// socket.rooms is a dictionary nonsensical key/value pairs 
-			io.to(Object.keys(socket.rooms)[1]).emit('heartbeat', serversdict[usertoservermap[socket.id]]);
+			io.to(Object.keys(socket.rooms)[1]).emit('heartbeat', [serversdict[usertoservermap[socket.id]], usertoservermap[socket.id]]);
 		}
 
 
