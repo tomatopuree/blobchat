@@ -4,6 +4,9 @@ function Server(blobsdict, chatslist, serverpermanents) {
   this.serverpermanents = serverpermanents;
 }
 
+
+
+
 currentserver = new Server(blobsdict = {}, chatslist = [], serverpermanents = []);
 
 var socket;
@@ -124,16 +127,17 @@ function draw() {
   }
 
   //  create world using server permanents
-  // for (var k = 0; k < serverpermanents.length; k++) {
+  for (var k = 0; k < serverpermanents.length; k++) {
 
-  //   // portal & portaltext
-  //   fill(255);
-  //   ellipse(serverpermanents[k].pos.x, serverpermanents[k].pos.y, serverpermanents[k].r, serverpermanents[k].r);
-  //   fill('blue');
-  //   textAlign(CENTER);
-  //   textSize(6);
-  //   text(serverpermanents[k].name, serverpermanents[k].pos.x-1, -5);
-  // }
+    // portal & portaltext
+    fill(255);
+    ellipse(serverpermanents[k].x, serverpermanents[k].y, serverpermanents[k].r, serverpermanents[k].r);
+    fill('blue');
+    textAlign(CENTER);
+    textSize(6);
+    text(serverpermanents[k].name, serverpermanents[k].x-1, -5);
+  }
+
 
   blob.show();
   if (mouseIsPressed) {
@@ -147,6 +151,8 @@ function draw() {
     r: blob.r
   };
   socket.emit('update', data);
+
+
 
 }
 

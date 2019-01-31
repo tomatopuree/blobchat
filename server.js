@@ -27,17 +27,6 @@ function Blob(name, id, x, y, r) {
 }
 
 
-function Blob(name, id, x, y, r) {
-	this.name = name;
-	this.id = id;
-	this.x = x;
-	this.y = y;
-	this.r = r;
-	this.lastchat = "";
-	this.lastchattime = 0;
-}
-
-
 
 function Server(blobsdict, chatslist, serverpermanents) {
 	this.blobsdict = blobsdict;
@@ -70,8 +59,8 @@ io.sockets.on('connection',
 
 			// lobby server permanents
 			var serverpermanents = [];
-			portal1 = new Blob("Portal to Game", "portal1", 150, 0, 5);
-			portal2 = new Blob("Portal to Room #2", "portal2", -150, 0, 5);
+			portal1 = new Blob("Portal to Game", "togame", 150, 0, 5);
+			portal2 = new Blob("Portal to Room #2", "toroomtwo", -150, 0, 5);
 			serverpermanents.push(portal1);
 			serverpermanents.push(portal2);
 			
@@ -156,6 +145,55 @@ io.sockets.on('connection',
 						return value;
 					}
 				});
+
+
+				// check collision with currently displayed server permanents
+				tblob = serversdict[usertoservermap[socket.id]].blobsdict[socket.id];
+				for (var k = 0; k < serversdict[usertoservermap[socket.id]].serverpermanents.length; k++) {
+					portal1 = serversdict[usertoservermap[socket.id]].serverpermanents[k];
+					if ((portal1.r + tblob.r) > (Math.sqrt(Math.pow(Math.abs(tblob.x - portal1.x),2)+Math.pow(Math.abs(tblob.y - portal1.y),2)))) {
+						if (portal1.id == "togame" && !('game' in serversdict)) {
+							var chatslist = [];
+							var blobsdict = {};
+							var serverpermanents = [];
+							// game server world permanents
+							portal3 = new Blob("Portal back to Lobby", "tolobby", 0, 40, 5);
+							serverpermanents.push(portal3);
+							
+							// put new server in serversdict
+							gameserver = new Server(blobsdict, chatslist, serverpermanents);
+							serversdict['game'] = gameserver;
+						}
+
+						if (portal1.id == "togame") {
+							socket.leave('lobby');
+							socket.join('game');	
+							usertoservermap[socket.id] = 'game';
+							// put blob in new server
+							serversdict[usertoservermap[socket.id]].blobsdict[socket.id] = serversdict['lobby'].blobsdict[socket.id];
+							// take blob off old server
+							delete serversdict['lobby'].blobsdict[socket.id];
+						}
+
+						if (portal1.id == "tolobby") {
+							socket.leave('game');
+							socket.join('lobby');	
+							usertoservermap[socket.id] = 'lobby';
+							// put blob in new server
+							serversdict[usertoservermap[socket.id]].blobsdict[socket.id] = serversdict['game'].blobsdict[socket.id];
+							// take blob off old server
+							delete serversdict['game'].blobsdict[socket.id];
+						}
+
+				}
+				  
+
+
+				}
+
+			
+
+
 		 	}
 		);
  
@@ -178,7 +216,9 @@ io.sockets.on('connection',
 
 				var chatslist = [];
 				var blobsdict = {};
-				// game server permanents
+				// game server world permanents
+				portal3 = new Blob("Portal back to Lobby", "portal3", 0, 40, 5);
+				serverpermanents.push(portal1);
 				var serverpermanents = [];
 				
 				// put new server in serversdict
