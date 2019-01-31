@@ -50,11 +50,17 @@ function Server(blobsdict, chatslist, serverpermanents) {
 var serversdict = {};
 var usertoservermap = {};
 
+var servers = ['lobby', 'game', 'roomtwo'];
+
 
 /// Register a callback function upon each individual connection
 io.sockets.on('connection',
 
 	function(socket) {
+
+		// ROOM 
+		socket.join('lobby');
+
 
 		// keep track of which server this guy is connected to
 		usertoservermap[socket.id] = 'lobby';
@@ -71,14 +77,17 @@ io.sockets.on('connection',
 			
 			lobby = new Server(blobsdict = {}, chatslist = [], serverpermanents);
 			
-			serversdict['lobby'] = lobby;	
+			serversdict['lobby'] = lobby;
 		}
 
 
 		/// Continuously sends [blobsdict, chatslist] 
 		setInterval(heartbeat, 33);
 		function heartbeat() {
-			io.sockets.emit('heartbeat', serversdict[usertoservermap[socket.id]]);
+			// io.sockets.emit('heartbeat', serversdict[usertoservermap[socket.id]]);
+			// ROOM
+			// socket.rooms is a dictionary nonsensical key/value pairs 
+			io.to(Object.keys(socket.rooms)[1]).emit('heartbeat', serversdict[usertoservermap[socket.id]]);
 		}
 
 
@@ -163,13 +172,9 @@ io.sockets.on('connection',
 
 		socket.on('serverchange', function(data) {
 			// console.log("Len of dict is " + Object.keys(blobsdict).length);
-		 		
-		 	// this user is in game server now
-			console.log("Client " + serversdict[usertoservermap[socket.id]].blobsdict[socket.id].name + " changed server to " + usertoservermap[socket.id]);
-			usertoservermap[socket.id] = 'game';
 
-		 	// make game server if there isnt one
-			if (data.message == "toGame" && !('game' in serversdict)){
+			// make game server if there isnt one
+			if (data.message == "game" && !('game' in serversdict)){
 
 				var chatslist = [];
 				var blobsdict = {};
@@ -178,14 +183,44 @@ io.sockets.on('connection',
 				
 				// put new server in serversdict
 				gameserver = new Server(blobsdict, chatslist, serverpermanents);
-				serversdict[usertoservermap[socket.id]] = gameserver;
-
+				serversdict['game'] = gameserver;
 			}
 
-			// put blob in new server
-			serversdict[usertoservermap[socket.id]].blobsdict[socket.id] = serversdict['lobby'].blobsdict[socket.id];
-			// take blob off old server
-			delete serversdict['lobby'].blobsdict[socket.id];
+
+
+			// ROOM
+			if (data.message == "game") {
+				socket.leave('lobby');
+				socket.join('game');	
+				usertoservermap[socket.id] = 'game';
+				// put blob in new server
+				serversdict[usertoservermap[socket.id]].blobsdict[socket.id] = serversdict['lobby'].blobsdict[socket.id];
+				// take blob off old server
+				delete serversdict['lobby'].blobsdict[socket.id];
+			}
+
+			if (data.message == "lobby") {
+				socket.leave('game');
+				socket.join('lobby');	
+				usertoservermap[socket.id] = 'lobby';
+				// put blob in new server
+				serversdict[usertoservermap[socket.id]].blobsdict[socket.id] = serversdict['game'].blobsdict[socket.id];
+				// take blob off old server
+				delete serversdict['game'].blobsdict[socket.id];
+			}
+
+
+		 		
+		 	// this user is in game server now
+		 	// console.log(Object.keys(serversdict));
+
+
+
+
+			console.log("Client " + serversdict[usertoservermap[socket.id]].blobsdict[socket.id].name + " changed server to " + usertoservermap[socket.id]);
+
+
+
 
 
 		});
@@ -193,14 +228,5 @@ io.sockets.on('connection',
 );
 
 
-
-
-
-
-// var aserver = new serverAbstraction(blobsdict, chatslist);
-// serverdict[0] = aserver;
-// for (var key in serverdict) {
-// 	serverdict[key];
-// }
 
 
