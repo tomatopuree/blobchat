@@ -26,8 +26,8 @@ function setup() {
   
   createCanvas(resolutionW, resolutionH);
   
-  // socket = io.connect('https://damp-citadel-76206.herokuapp.com/');
-  socket = io.connect('http://localhost:3000');
+  socket = io.connect('https://damp-citadel-76206.herokuapp.com/');
+  // socket = io.connect('http://localhost:3000');
 
   // CHAT INPUT
   input = createInput();

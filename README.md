@@ -1,6 +1,13 @@
 # blobchat
 Canvas based top-down chat game
 
+DEMO:
+https://damp-citadel-76206.herokuapp.com
+
+
+
+
+
 To-do
 
 Spatial:
