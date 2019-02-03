@@ -21,3 +21,6 @@ Performance:
 Only get local information emitted
 smooth movement
 
+Misc:
+
+Pick your color

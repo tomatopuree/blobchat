@@ -24,6 +24,8 @@ function Blob(name, id, x, y, r) {
 	this.r = r;
 	this.lastchat = "";
 	this.lastchattime;
+	this.velx = 0;
+	this.vely = 0;
 }
 
 function Server(blobsdict, chatslist, serverpermanents) {
@@ -34,6 +36,7 @@ function Server(blobsdict, chatslist, serverpermanents) {
 
 var serversdict = {};
 var usertoservermap = {};
+var socketidlist = [];
 
 /// Register a callback function upon each individual connection
 io.sockets.on('connection',
@@ -44,6 +47,8 @@ io.sockets.on('connection',
 		// and dynamically update it
 		socket.join('lobby');
 
+		socketidlist.push(socket.id);
+
 		// keep track of which server this guy is connected to
 		usertoservermap[socket.id] = 'lobby';
 
@@ -51,8 +56,8 @@ io.sockets.on('connection',
 		if (Object.keys(serversdict).length == 0 && !('lobby' in serversdict)) {
 			// lobby server permanents
 			var serverpermanents = [];
-			portal1 = new Blob("Portal to Game", "togame", 150, 0, 5);
-			portal2 = new Blob("Portal to Room #2", "toroomtwo", -150, 0, 5);
+			let portal1 = new Blob("Portal to Game", "game", 150, 0, 5);
+			let portal2 = new Blob("Portal to Room #2", "roomtwo", -150, 0, 5);
 			serverpermanents.push(portal1);
 			serverpermanents.push(portal2);
 			
@@ -126,44 +131,60 @@ io.sockets.on('connection',
 					if (time < value[1]+(chatDisappear2*1000)) {
 						return value;
 					}
-			});
+				});
+
+				// check between player to player
+				thisblob = serversdict[usertoservermap[socket.id]].blobsdict[socket.id];
+				for (var id in serversdict[usertoservermap[socket.id]].blobsdict) {
+					if (id == socket.id) {continue;} // dont collide with oneself
+					if (colliding(serversdict[usertoservermap[socket.id]].blobsdict[id], thisblob)) {
+						serversdict[usertoservermap[socket.id]].blobsdict[id].x
+						serversdict[usertoservermap[socket.id]].blobsdict[id].y
+						serversdict[usertoservermap[socket.id]].blobsdict[socket.id].x
+						serversdict[usertoservermap[socket.id]].blobsdict[socket.id].y
+				}}
+
 
 				// check collision with currently displayed server permanents
 				tblob = serversdict[usertoservermap[socket.id]].blobsdict[socket.id];
 				for (var k = 0; k < serversdict[usertoservermap[socket.id]].serverpermanents.length; k++) {
-					portal1 = serversdict[usertoservermap[socket.id]].serverpermanents[k];
-					if ((portal1.r + tblob.r) > (Math.sqrt(Math.pow(Math.abs(tblob.x - portal1.x),2)+Math.pow(Math.abs(tblob.y - portal1.y),2)))) {
+					let portal = serversdict[usertoservermap[socket.id]].serverpermanents[k];	
+						
+
+					if (colliding(tblob, portal)) {
 						// if we are going to game server and game server wasnt initialized
-						if (portal1.id == "togame" && !('game' in serversdict)) {
+						if (portal.id == "game" && !('game' in serversdict)) {
 							var chatslist = [];
 							var blobsdict = {};
 							var serverpermanents = [];
 							// game server world permanents
-							portal3 = new Blob("Portal back to Lobby", "tolobby", 0, 40, 5);
+							portal3 = new Blob("Portal back to Lobby", "lobby", 0, 40, 5);
 							serverpermanents.push(portal3);
 							// put new server in serversdict
 							gameserver = new Server(blobsdict, chatslist, serverpermanents);
 							serversdict['game'] = gameserver;
 						}
 
-						if (portal1.id == "togame") {
-							socket.leave('lobby');
-							socket.join('game');
-							usertoservermap[socket.id] = 'game';
-							// put blob in new server
-							serversdict[usertoservermap[socket.id]].blobsdict[socket.id] = serversdict['lobby'].blobsdict[socket.id];
-							// take blob off old server
-							delete serversdict['lobby'].blobsdict[socket.id];
+						if (portal.id == "game") {
+							console.log(socket.id + "changed room to " + portal.id);
+							var oldserver = usertoservermap[socket.id];
+							var newserver = portal.id;
+							socket.leave(oldserver);
+							socket.join(newserver);
+							usertoservermap[socket.id] = newserver;
+							serversdict[usertoservermap[socket.id]].blobsdict[socket.id] = serversdict[oldserver].blobsdict[socket.id];
+							delete serversdict[oldserver].blobsdict[socket.id];
 						}
 
-						if (portal1.id == "tolobby") {
-							socket.leave('game');
-							socket.join('lobby');
-							usertoservermap[socket.id] = 'lobby';
-							// put blob in new server
-							serversdict[usertoservermap[socket.id]].blobsdict[socket.id] = serversdict['game'].blobsdict[socket.id];
-							// take blob off old server
-							delete serversdict['game'].blobsdict[socket.id];
+						if (portal.id == "lobby") {
+							console.log(socket.id + "changed room to " + portal.id);
+							var oldserver = usertoservermap[socket.id];
+							var newserver = portal.id;
+							socket.leave(oldserver);
+							socket.join(newserver);
+							usertoservermap[socket.id] = newserver;
+							serversdict[usertoservermap[socket.id]].blobsdict[socket.id] = serversdict[oldserver].blobsdict[socket.id];
+							delete serversdict[oldserver].blobsdict[socket.id];
 						}
 					}  
 				}
@@ -180,6 +201,32 @@ io.sockets.on('connection',
   }
 );
 
+
+function colliding(blob1, blob2) {
+	return ((blob1.r + blob2.r) > euclidianblob(blob1, blob2));
+}
+
+function euclidianblob(blob1, blob2) {
+	return Math.sqrt(Math.pow(Math.abs(blob1.x - blob2.x),2)+Math.pow(Math.abs(blob1.y - blob2.y),2));
+}
+
+
+function vector(startx, startx, endx, endy) {
+	this.startx = startx;
+	this.starty = starty;
+	this.endx = endx;
+	this.endy = endy;
+	this.magnitude = euclidian()
+}
+
+
+
+// function circlelinecollision(linestartx, linestarty, lineendx, lineendy, circlex, circley, circler) {
+// 	let line = [lineendx-linestartx, lineendy-linestarty];
+// 	let starttocircle = [lineendx- circlex, lineendy-circley];
+// 	let dotprod = 
+
+// }
 
 
 

@@ -6,6 +6,8 @@ function Blob(name, id, x, y, r) {
 	this.pos = createVector(x, y);
 	this.r = r;
 	this.vel = createVector(0, 0);
+	this.velx = this.vel.x;
+	this.vely = this.vel.y;
 
 	/// update position and smooth velocity
 	this.update_position = function() {
@@ -51,8 +53,8 @@ function setup() {
 	
 	createCanvas(resolutionW, resolutionH);
 	
-	// socket = io.connect('https://damp-citadel-76206.herokuapp.com/');
-	socket = io.connect('http://localhost:3000');
+	socket = io.connect('https://damp-citadel-76206.herokuapp.com/');
+	// socket = io.connect('http://localhost:3000');
 
 	create_chat_pane();
 
@@ -234,16 +236,17 @@ function draw_metadata() {
 // update with other blob info
 function draw_other_blobs() {
 	for (var keyy in blobsdict) {
-		fill(0, 0, 255);
-		ellipse(blobsdict[keyy].x, blobsdict[keyy].y, blobsdict[keyy].r * 2, blobsdict[keyy].r * 2);
-
 		textAlign(CENTER);
 		textSize(4);
 		fill(255);
 		text(blobsdict[keyy].lastchat, blobsdict[keyy].x, blobsdict[keyy].y + blobsdict[keyy].r + 4);
-		
+
 		fill(0);
 		text(blobsdict[keyy].name, blobsdict[keyy].x, blobsdict[keyy].y - (blobsdict[keyy].r+2));
+		
+		if (socket.id == blobsdict[keyy].id) {continue; }
+		fill(0, 0, 255);
+		ellipse(blobsdict[keyy].x, blobsdict[keyy].y, blobsdict[keyy].r * 2, blobsdict[keyy].r * 2);
 	}
 }
 
