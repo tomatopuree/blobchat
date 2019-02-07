@@ -28,10 +28,10 @@ function Blob(name, id, x, y, r) {
 	this.vely = 0;
 }
 
-function Server(blobsdict, chatslist, serverpermanents) {
-	this.blobsdict = blobsdict;
-	this.chatslist = chatslist;
-	this.serverpermanents = serverpermanents;
+function Server(a, b, c) {
+	this.blobsdict = a;
+	this.chatslist = b;
+	this.serverpermanents = c;
 }
 
 var serversdict = {};

@@ -22,7 +22,7 @@ function Blob(name, id, x, y, r) {
 		blob.pos.x = constrain(blob.pos.x, -width / 4, width / 4);
 		blob.pos.y = constrain(blob.pos.y, -height / 4, height / 4);
 		fill(255);
-		ellipse(this.pos.x, this.pos.y, this.r * 2, this.r * 2);
+		ellipse(this.pos.x, this.pos.y, this.r*2, this.r*2);
 	}
 }
 
@@ -42,7 +42,7 @@ var blobsdict = {};
 var chatslist = [];
 var serverpermanents = [];
 
-var zoom = 1;
+var zoom = 3;
 var input, button, greeting;
 
 var resolutionW = 1400;
@@ -53,8 +53,8 @@ function setup() {
 	
 	createCanvas(resolutionW, resolutionH);
 	
-	socket = io.connect('https://damp-citadel-76206.herokuapp.com/');
-	// socket = io.connect('http://localhost:3000');
+	// socket = io.connect('https://damp-citadel-76206.herokuapp.com/');
+	socket = io.connect('http://localhost:3000');
 
 	create_chat_pane();
 
@@ -86,6 +86,8 @@ function draw() {
 	draw_chat_pane();
 	
 	draw_metadata();
+
+	draw_minimap();
 
 	// Anything before below chunk of code will be anchored to "camera"
 	// Anything after below chunk of code will not be anchored to "camera"
@@ -199,6 +201,51 @@ function rename() {
 ////////////////// DRAW FUNCTIONS //////////////////
 ////////////////////////////////////////////////////
 
+
+function draw_minimap() {
+
+	let scale = 5;
+	let xshift = resolutionW * 18.8/20;
+	let yshift = resolutionH * 1.3/20;
+	let padding = 30/scale;
+
+	function minimapizex(x) {return (x/scale)+xshift;}
+	function minimapizey(y) {return (y/scale)+yshift;}
+
+	// bg for minimap
+	fill(0, 0, 255, 127);
+	rect(xshift - (width/(scale*4))-padding, yshift - (height/(scale*4))-padding, (width/(scale*2))+padding*2, (height/(scale*2))+padding*2);
+
+	for (var keyy in blobsdict) {
+		let x = blobsdict[keyy].x;
+		let y = blobsdict[keyy].y;
+		let r = blobsdict[keyy].r;
+
+		textAlign(CENTER);
+		textSize(4/scale);
+		fill(255);
+		text(blobsdict[keyy].lastchat, minimapizex(x), minimapizey(y + r + 4));
+
+		fill(0);
+		text(blobsdict[keyy].name, minimapizex(x), minimapizey(y - r + 2));
+		
+		fill(0, 255, 255);
+		ellipse(minimapizex(x), minimapizey(y), (r*2)/scale, (r*2)/scale);
+	}
+	
+	for (var k = 0; k < serverpermanents.length; k++) {
+		// portal & portaltext
+		fill(255);
+		ellipse(minimapizex(serverpermanents[k].x), minimapizey(serverpermanents[k].y), serverpermanents[k].r/scale, serverpermanents[k].r/scale);
+		
+		fill('blue');
+		textAlign(CENTER);
+		textSize(6/scale);
+		text(serverpermanents[k].name, serverpermanents[k].x-1/scale, -5/scale);
+	}
+
+}
+
 // update with chats
 function draw_chat_pane() {
 	for (var i = 0; i < chatslist.length; i++) {
@@ -246,7 +293,7 @@ function draw_other_blobs() {
 		
 		if (socket.id == blobsdict[keyy].id) {continue; }
 		fill(0, 0, 255);
-		ellipse(blobsdict[keyy].x, blobsdict[keyy].y, blobsdict[keyy].r * 2, blobsdict[keyy].r * 2);
+		ellipse(blobsdict[keyy].x, blobsdict[keyy].y, blobsdict[keyy].r*2, blobsdict[keyy].r*2);
 	}
 }
 
