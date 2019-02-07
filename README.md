@@ -1,10 +1,7 @@
 # blobchat
-Canvas based top-down chat game
 
 DEMO:
 https://damp-citadel-76206.herokuapp.com
-
-
 
 
 
@@ -18,7 +15,7 @@ fortnite type multiseat topdown vehicles
 
 Performance: 
 
-Only get local information emitted
+Only get in-camera information emitted
 smooth movement
 
 Misc:
