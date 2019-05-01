@@ -8,6 +8,6 @@ https://damp-citadel-76206.herokuapp.com
 
 
 Notes to self for possible future additions:
-? increase/decrease blobsize station
-? multiseat vehicles
-? an actual game in game room
+* increase/decrease blobsize station
+* multiseat vehicles
+* an actual game in game room
